@@ -1,0 +1,18 @@
+# docker compose -f docker-compose.dev.yml up --build -d
+services:
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - WEBAPP_URL=${WEBAPP_URL}
+    restart: unless-stopped
+    # Включаем интерактивный режим для корректной работы с терминалом
+    stdin_open: true
+    tty: true 
