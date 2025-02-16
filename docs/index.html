@@ -112,6 +112,22 @@
                 padding: 2rem 1rem;
             }
         }
+
+        .start-button {
+            background: linear-gradient(141deg, #1f3a5f 0%, #2b5ca5 71%, #3273dc 100%) !important;
+            border: none !important;
+            transition: transform 0.2s, box-shadow 0.2s !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .start-button .icon {
+            margin-right: 0.5em;
+        }
     </style>
 </head>
 <body>
@@ -148,6 +164,14 @@
                 <div class="column is-half">
                     <h3 class="title is-3">О боте</h3>
                     <p>Наш Telegram-бот создан для помощи практикующим в отслеживании и соблюдении Благородного Восьмеричного Пути в повседневной жизни. С его помощью вы сможете вести ежедневный журнал практики и получать подробную статистику по каждому аспекту пути.</p>
+                    <div class="mt-5">
+                        <a href="https://t.me/eight_truths_way_bot" class="button is-primary is-medium start-button">
+                            <span class="icon">
+                                <img src="telegram-svgrepo-com.svg" alt="" style="width: 20px; height: 20px; filter: brightness(0) invert(1);">
+                            </span>
+                            <span>Открыть бота</span>
+                        </a>
+                    </div>
                 </div>
                 <div class="column is-half">
                     <figure class="image is-4by4">
