@@ -20,7 +20,8 @@ const excludePatterns = [
     '.git',
     '.env',
     'data.db',
-    '.DS_Store'
+    '.DS_Store',
+    'pages'
 ];
 
 // Функция для проверки, нужно ли исключить файл/папку
