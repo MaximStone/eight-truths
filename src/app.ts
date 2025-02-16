@@ -63,7 +63,8 @@ async function startServer() {
                     entry.truth6,
                     entry.truth7,
                     entry.truth8
-                ]
+                ],
+                comment: entry.comment
             }));
 
             res.json(report);
@@ -76,11 +77,17 @@ async function startServer() {
     // API-эндпоинт для сохранения записи
     app.post('/api/entry', telegramAuthMiddleware, async (req: any, res) => {
         try {
-            const { date, truths } = req.body;
+            const { date, truths, comment } = req.body;
             const telegramUser = req.telegramUser;
 
-            if (!date || !Array.isArray(truths) || truths.length !== 8) {
-                return res.status(400).json({ error: "Неверный формат данных" });
+            // Проверяем наличие даты
+            if (!date) {
+                return res.status(400).json({ error: "Дата не указана" });
+            }
+
+            // Проверяем массив истин только если он предоставлен
+            if (truths && (!Array.isArray(truths) || truths.length !== 8)) {
+                return res.status(400).json({ error: "Неверный формат данных истин" });
             }
 
             const userRepository = AppDataSource.getRepository(User);
@@ -105,15 +112,22 @@ async function startServer() {
                 entry.date = date;
             }
 
-            // Обновляем значения истин
-            entry.truth1 = truths[0];
-            entry.truth2 = truths[1];
-            entry.truth3 = truths[2];
-            entry.truth4 = truths[3];
-            entry.truth5 = truths[4];
-            entry.truth6 = truths[5];
-            entry.truth7 = truths[6];
-            entry.truth8 = truths[7];
+            // Обновляем значения истин, если они предоставлены
+            if (truths) {
+                entry.truth1 = truths[0];
+                entry.truth2 = truths[1];
+                entry.truth3 = truths[2];
+                entry.truth4 = truths[3];
+                entry.truth5 = truths[4];
+                entry.truth6 = truths[5];
+                entry.truth7 = truths[6];
+                entry.truth8 = truths[7];
+            }
+
+            // Обновляем комментарий, если он предоставлен
+            if (comment !== undefined) {
+                entry.comment = comment;
+            }
 
             await entryRepository.save(entry);
             res.json({ success: true });

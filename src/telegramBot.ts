@@ -6,6 +6,7 @@ import { format, subDays } from 'date-fns';
 
 export interface MySession {
     entry: boolean[];
+    awaitingComment: boolean;
 }
 
 export interface MyContext extends Context {
@@ -30,13 +31,13 @@ if (!TELEGRAM_TOKEN) {
 }
 
 export const bot = new Telegraf<MyContext>(TELEGRAM_TOKEN);
-bot.use(session({ defaultSession: () => ({ entry: Array(8).fill(true) }) }));
+bot.use(session({ defaultSession: () => ({ entry: Array(8).fill(true), awaitingComment: false }) }));
 
 function buildMainMenu() {
     return Markup.keyboard([
         ['📝 Новая запись'],
         ['📊 Отчет за неделю', '📈 Отчет за месяц'],
-        ['📱 Открыть веб-версию', 'ℹ️ Помощь']
+        ['💭 Добавить комментарий', 'ℹ️ Помощь']
     ]).resize();
 }
 
@@ -84,23 +85,58 @@ async function generateReport(userId: number, days: number) {
 
     let report = `📊 Отчет за ${days === 6 ? 'неделю' : 'месяц'}:\n\n`;
     
-    entries.forEach(entry => {
-        const date = format(new Date(entry.date), 'dd.MM.yyyy');
-        const notFollowed = [];
-        
-        if (!entry.truth1) notFollowed.push(TRUTHS[0]);
-        if (!entry.truth2) notFollowed.push(TRUTHS[1]);
-        if (!entry.truth3) notFollowed.push(TRUTHS[2]);
-        if (!entry.truth4) notFollowed.push(TRUTHS[3]);
-        if (!entry.truth5) notFollowed.push(TRUTHS[4]);
-        if (!entry.truth6) notFollowed.push(TRUTHS[5]);
-        if (!entry.truth7) notFollowed.push(TRUTHS[6]);
-        if (!entry.truth8) notFollowed.push(TRUTHS[7]);
+    // Создаем массив всех дат в периоде
+    const allDates = Array.from({length: days + 1}, (_, i) => subDays(new Date(), days - i));
+    
+    allDates.forEach(date => {
+        const dateString = format(date, 'yyyy-MM-dd');
+        const entry = entries.find(e => e.date === dateString);
+        const dayName = format(date, 'EEEE').toLowerCase();
+        const russianDays = {
+            monday: 'Понедельник',
+            tuesday: 'Вторник',
+            wednesday: 'Среда',
+            thursday: 'Четверг',
+            friday: 'Пятница',
+            saturday: 'Суббота',
+            sunday: 'Воскресенье'
+        };
 
-        report += `${date}: ${notFollowed.length === 0 ? 
-            '✅ Все истины соблюдены' : 
-            '❌ Не соблюдались: ' + notFollowed.join(', ')}\n`;
+        const notFollowed = [];
+        if (entry) {
+            if (!entry.truth1) notFollowed.push(TRUTHS[0]);
+            if (!entry.truth2) notFollowed.push(TRUTHS[1]);
+            if (!entry.truth3) notFollowed.push(TRUTHS[2]);
+            if (!entry.truth4) notFollowed.push(TRUTHS[3]);
+            if (!entry.truth5) notFollowed.push(TRUTHS[4]);
+            if (!entry.truth6) notFollowed.push(TRUTHS[5]);
+            if (!entry.truth7) notFollowed.push(TRUTHS[6]);
+            if (!entry.truth8) notFollowed.push(TRUTHS[7]);
+        }
+
+        const displayDate = days === 6 
+            ? russianDays[dayName as keyof typeof russianDays]
+            : format(date, 'dd.MM.yyyy');
+
+        report += `▫️ ${displayDate}:\n${
+            notFollowed.length === 0 
+                ? '   ✅ Все практики соблюдены\n'
+                : `   ❌ ${notFollowed.join(', ')}\n`
+        }${
+            entry?.comment 
+                ? `   📝 Комментарий: ${entry.comment}\n\n` 
+                : '\n'
+        }`;
     });
+
+    // Добавляем раздел с комментариями
+    const allComments = entries.filter(e => e.comment).map(e => 
+        `▫️ ${format(new Date(e.date), 'dd.MM')}: ${e.comment}`
+    ).join('\n');
+
+    if (allComments) {
+        report += `\n📌 Комментарии за период:\n${allComments}`;
+    }
 
     return report;
 }
@@ -122,17 +158,13 @@ bot.start(async (ctx) => {
         await userRepository.save(user);
     }
 
-    // Создаем кнопку для Web App
-    const webAppUrl = process.env.WEBAPP_URL || 'https://your-domain.com';
-    const webAppButton = Markup.button.webApp('📊 Отчет', webAppUrl);
-
     await ctx.reply(
         "Добро пожаловать! Этот бот поможет вам отслеживать соблюдение Благородного Восьмеричного Пути.\n\n" +
         "Используйте меню ниже для навигации или нажмите кнопку для открытия веб-версии:",
         Markup.keyboard([
-            ['📝 Новая запись'],
-            ['📊 Отчет за неделю', '📈 Отчет за месяц'],
-            ['📱 Открыть веб-версию', 'ℹ️ Помощь']
+            [{text: '📝 Новая запись'}, {text: '💭 Добавить комментарий'}],
+            [{text: '📊 Отчет за неделю'}, {text: '📈 Отчет за месяц'}],
+            [{text: 'ℹ️ Помощь'}]
         ]).resize()
     );
 });
@@ -147,7 +179,8 @@ bot.help((ctx) => {
         "/start - начать работу с ботом\n" +
         "/help - показать это сообщение\n" +
         "/report - сгенерировать отчет\n" +
-        "/new - создать новую запись",
+        "/new - создать новую запись\n" +
+        "/comment - добавить комментарий за сегодня",
         buildMainMenu()
     );
 });
@@ -165,6 +198,36 @@ bot.command('report', async (ctx) => {
             [Markup.button.callback("За месяц", "report_month")]
         ])
     );
+});
+
+bot.command('comment', async (ctx) => {
+    const chatId = ctx.chat?.id.toString();
+    if (!chatId) {
+        await ctx.reply("Чат id не найден.");
+        return;
+    }
+
+    const userRepository = AppDataSource.getRepository(User);
+    const entryRepository = AppDataSource.getRepository(Entry);
+    const user = await userRepository.findOne({ where: { chatId } });
+    if (!user) {
+        await ctx.reply("Пользователь не найден.");
+        return;
+    }
+
+    const today = format(new Date(), 'yyyy-MM-dd');
+    let entry = await entryRepository.findOne({ where: { user: { id: user.id }, date: today } });
+    if (!entry) {
+        entry = new Entry();
+        entry.user = user;
+        entry.date = today;
+    }
+
+    // Запрашиваем у пользователя комментарий
+    await ctx.reply("Пожалуйста, введите ваш комментарий для сегодняшнего дня:");
+    
+    // Устанавливаем флаг ожидания комментария
+    ctx.session.awaitingComment = true;
 });
 
 bot.hears('📝 Новая запись', async (ctx) => {
@@ -208,28 +271,31 @@ bot.hears('📈 Отчет за месяц', async (ctx) => {
     await ctx.reply(report);
 });
 
-bot.hears('📱 Открыть веб-версию', async (ctx) => {
+bot.hears('💭 Добавить комментарий', async (ctx) => {
     const chatId = ctx.chat?.id.toString();
     if (!chatId) {
         await ctx.reply("Чат id не найден.");
         return;
     }
-    
+
     const userRepository = AppDataSource.getRepository(User);
+    const entryRepository = AppDataSource.getRepository(Entry);
     const user = await userRepository.findOne({ where: { chatId } });
     if (!user) {
         await ctx.reply("Пользователь не найден.");
         return;
     }
-    
-    const webAppUrl = process.env.WEBAPP_URL || 'https://your-domain.com';
-    // Добавляем user_id в URL как параметр инициализации Web App
-    await ctx.reply(
-        'Нажмите кнопку ниже, чтобы открыть веб-версию отчета:',
-        Markup.inlineKeyboard([
-            [Markup.button.webApp('📊 Открыть отчет', `${webAppUrl}?user_id=${user.id}`)]
-        ])
-    );
+
+    const today = format(new Date(), 'yyyy-MM-dd');
+    let entry = await entryRepository.findOne({ where: { user: { id: user.id }, date: today } });
+    if (!entry) {
+        entry = new Entry();
+        entry.user = user;
+        entry.date = today;
+    }
+
+    await ctx.reply("Пожалуйста, введите ваш комментарий для сегодняшнего дня:");
+    ctx.session.awaitingComment = true;
 });
 
 bot.hears('ℹ️ Помощь', async (ctx) => {
@@ -242,7 +308,8 @@ bot.hears('ℹ️ Помощь', async (ctx) => {
         "/start - начать работу с ботом\n" +
         "/help - показать это сообщение\n" +
         "/report - сгенерировать отчет\n" +
-        "/new - создать новую запись",
+        "/new - создать новую запись\n" +
+        "/comment - добавить комментарий за сегодня",
         buildMainMenu()
     );
 });
@@ -327,6 +394,40 @@ bot.action("submit", async (ctx) => {
     
     await entryRepository.save(entry);
     await ctx.editMessageText("Ваши данные сохранены. Спасибо!");
+});
+
+// Обработчик для получения комментария
+bot.on('text', async (ctx) => {
+    if (ctx.session.awaitingComment) {
+        const chatId = ctx.chat?.id.toString();
+        if (!chatId) {
+            await ctx.reply("Чат id не найден.");
+            return;
+        }
+
+        const userRepository = AppDataSource.getRepository(User);
+        const entryRepository = AppDataSource.getRepository(Entry);
+        const user = await userRepository.findOne({ where: { chatId } });
+        if (!user) {
+            await ctx.reply("Пользователь не найден.");
+            return;
+        }
+
+        const today = format(new Date(), 'yyyy-MM-dd');
+        let entry = await entryRepository.findOne({ where: { user: { id: user.id }, date: today } });
+        if (!entry) {
+            entry = new Entry();
+            entry.user = user;
+            entry.date = today;
+        }
+
+        entry.comment = ctx.message.text;
+        await entryRepository.save(entry);
+
+        ctx.session.awaitingComment = false;
+        await ctx.reply("Ваш комментарий сохранен!");
+        return;
+    }
 });
 
 bot.catch((err) => {

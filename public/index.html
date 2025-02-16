@@ -16,18 +16,21 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
         .nav-bar {
             display: flex;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--tg-theme-bg-color, #fff);
+            background: var(--tg-theme-bottom-bar-bg-color, #fff);
             border-top: 1px solid var(--tg-theme-hint-color, rgba(0, 0, 0, 0.1));
             padding: 8px 0;
             z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideInUp 0.3s ease forwards;
+            flex-shrink: 0;
         }
         .nav-item {
             flex: 1;
@@ -48,12 +51,14 @@
         .screen {
             display: none;
             padding: 16px;
-            padding-bottom: 80px;
-            min-height: 100vh;
-            box-sizing: border-box;
+            overflow-y: auto;
+            flex-grow: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
         }
         .screen.active {
             display: block;
+            opacity: 1;
         }
         
         /* Стили для экрана отчета */
@@ -61,6 +66,10 @@
             display: flex;
             gap: 8px;
             margin-bottom: 16px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.1s;
         }
         .period-button {
             flex: 1;
@@ -82,6 +91,10 @@
             background: var(--tg-theme-secondary-bg-color, #f0f0f0);
             border-radius: 8px;
             overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.2s;
         }
         .report-table th,
         .report-table td {
@@ -90,7 +103,7 @@
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
         .report-table th {
-            background: var(--tg-theme-button-color, #195ea3);
+            background: var(--tg-theme-secondary-bg-color, #0e375f);
             color: var(--tg-theme-button-text-color, #fff);
             font-weight: 500;
             position: sticky;
@@ -100,12 +113,12 @@
             position: sticky;
             left: 0;
             z-index: 2;
-            background: var(--tg-theme-button-color, #195ea3);
+            background: var(--tg-theme-secondary-bg-color, #0e375f);
         }
         .report-table td.date-cell {
             position: sticky;
             left: 0;
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            background: var(--tg-theme-secondary-bg-color, #0e375f);
             font-weight: 500;
             z-index: 1;
         }
@@ -121,6 +134,10 @@
         .truth-cell.not-followed {
             background: rgba(255, 59, 48, 0.2);
             color: #ff3b30;
+        }
+        .truth-cell.empty {
+            color: var(--tg-theme-hint-color, #999);
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
         }
         .truth-header {
             writing-mode: vertical-rl;
@@ -139,11 +156,21 @@
             margin-bottom: 16px;
             background: var(--tg-theme-secondary-bg-color, #f0f0f0);
             color: var(--tg-theme-text-color, #000);
+            box-sizing: border-box; /* Учитываем padding в общей ширине */
+            font-size: 16px; /* Добавляем явный размер шрифта */
+            -webkit-appearance: none; /* Убираем стандартные стили для iOS */
+            appearance: none; /* Убираем стандартные стили */
+            max-width: 100%; /* Ограничиваем максимальную ширину */
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.1s;
         }
         .truth-list {
             list-style: none;
             padding: 0;
             margin: 0;
+            margin-bottom: 16px;
         }
         .truth-item {
             display: flex;
@@ -153,6 +180,10 @@
             background: var(--tg-theme-secondary-bg-color, #f0f0f0);
             border-radius: 8px;
             cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.1s;
         }
         .truth-item.active {
             background: rgba(52, 199, 89, 0.1);
@@ -180,7 +211,12 @@
             color: var(--tg-theme-button-text-color, #fff);
             font-size: 16px;
             margin-top: 16px;
+            margin-bottom: 20px;
             cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.3s;
         }
 
         /* Стили для экрана правил */
@@ -202,6 +238,11 @@
             align-items: center;
             justify-content: center;
             min-height: 120px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.1s;
         }
         .rule-card:hover {
             transform: translateY(-2px);
@@ -229,6 +270,10 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.1s;
         }
         .rule-description {
             line-height: 1.6;
@@ -236,12 +281,20 @@
             background: var(--tg-theme-secondary-bg-color, #f0f0f0);
             padding: 16px;
             border-radius: 8px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.3s;
         }
         .rule-application {
             margin-bottom: 24px;
             background: rgba(52, 199, 89, 0.1);
             padding: 16px;
             border-radius: 8px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.4s;
         }
         .rule-application-title {
             font-weight: bold;
@@ -252,6 +305,10 @@
             background: var(--tg-theme-secondary-bg-color, #f0f0f0);
             padding: 16px;
             border-radius: 8px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.5s;
         }
         .rule-sources-title {
             font-weight: bold;
@@ -285,6 +342,10 @@
             align-items: center;
             gap: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInLeft 0.3s ease forwards;
+            animation-delay: 0.1s;
         }
         .back-button:hover {
             background: var(--tg-theme-bg-color, #fff);
@@ -306,6 +367,364 @@
             border-radius: 8px;
             margin-top: 16px;
         }
+
+        /* Добавляем стили для блока управления состоянием */
+        .truth-status-control {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.2s;
+        }
+
+        .truth-status-date {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #999);
+            margin-bottom: 12px;
+        }
+
+        .truth-status-toggle {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .truth-status-button {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .truth-status-button.followed {
+            background: rgba(52, 199, 89, 0.2);
+            color: #34c759;
+        }
+
+        .truth-status-button.not-followed {
+            background: rgba(255, 59, 48, 0.2);
+            color: #ff3b30;
+        }
+
+        .truth-status-button.active {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .truth-status-button:not(.active) {
+            opacity: 0.5;
+        }
+
+        /* Стили для секции комментариев */
+        .comments-section {
+            margin-top: 24px;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 8px;
+            padding: 16px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.3s;
+        }
+
+        .comments-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: var(--tg-theme-text-color, #000);
+        }
+
+        .comment-item {
+            background: var(--tg-theme-bg-color, #fff);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .comment-date {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--tg-theme-hint-color, #999);
+        }
+
+        .comment-text {
+            color: var(--tg-theme-text-color, #000);
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .comment-edit {
+            background: none;
+            border: none;
+            padding: 4px;
+            cursor: pointer;
+            color: var(--tg-theme-button-color, #3390ec);
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .comment-edit:hover {
+            opacity: 1;
+        }
+
+        .comment-content {
+            flex: 1;
+            margin-right: 12px;
+        }
+
+        .no-comments {
+            text-align: center;
+            color: var(--tg-theme-hint-color, #999);
+            padding: 16px;
+        }
+
+        .comment-input {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 1px solid var(--tg-theme-hint-color, rgba(0, 0, 0, 0.1));
+            border-radius: 8px;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #000);
+            font-family: inherit;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: none;
+            overflow: auto;
+            field-sizing:content;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+            animation-delay: 0.2s;
+        }
+
+        .comment-input::placeholder {
+            color: var(--tg-theme-hint-color, #999);
+        }
+
+        textarea {
+            min-height: 150px;
+            height: fit-content;
+            overflow-y: hidden;
+        }
+
+        .truth-status-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .truth-status-indicator.followed {
+            background: rgba(52, 199, 89, 0.2);
+            color: #34c759;
+        }
+
+        .truth-status-indicator.not-followed {
+            background: rgba(255, 59, 48, 0.2);
+            color: #ff3b30;
+        }
+
+        /* Анимации для элементов */
+        .period-selector,
+        .report-table,
+        .comments-section,
+        .truth-list li,
+        .rules-grid .rule-card,
+        .rule-details > *,
+        .date-input,
+        .comment-input,
+        .submit-button {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        /* Задержки для разных элементов */
+        .period-selector { animation-delay: 0.1s; }
+        .report-table { animation-delay: 0.2s; }
+        .comments-section { animation-delay: 0.3s; }
+        .date-input { animation-delay: 0.1s; }
+        .comment-input { animation-delay: 0.2s; }
+        .submit-button { animation-delay: 0.3s; }
+
+        .truth-list li:nth-child(1) { animation-delay: 0.1s; }
+        .truth-list li:nth-child(2) { animation-delay: 0.15s; }
+        .truth-list li:nth-child(3) { animation-delay: 0.2s; }
+        .truth-list li:nth-child(4) { animation-delay: 0.25s; }
+        .truth-list li:nth-child(5) { animation-delay: 0.3s; }
+        .truth-list li:nth-child(6) { animation-delay: 0.35s; }
+        .truth-list li:nth-child(7) { animation-delay: 0.4s; }
+        .truth-list li:nth-child(8) { animation-delay: 0.45s; }
+
+        .rules-grid .rule-card:nth-child(1) { animation-delay: 0.1s; }
+        .rules-grid .rule-card:nth-child(2) { animation-delay: 0.15s; }
+        .rules-grid .rule-card:nth-child(3) { animation-delay: 0.2s; }
+        .rules-grid .rule-card:nth-child(4) { animation-delay: 0.25s; }
+        .rules-grid .rule-card:nth-child(5) { animation-delay: 0.3s; }
+        .rules-grid .rule-card:nth-child(6) { animation-delay: 0.35s; }
+        .rules-grid .rule-card:nth-child(7) { animation-delay: 0.4s; }
+        .rules-grid .rule-card:nth-child(8) { animation-delay: 0.45s; }
+
+        .rule-details .rule-header { animation-delay: 0.1s; }
+        .rule-details .truth-status-control { animation-delay: 0.2s; }
+        .rule-details .rule-description { animation-delay: 0.3s; }
+        .rule-details .rule-application { animation-delay: 0.4s; }
+        .rule-details .rule-sources { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Анимация для кнопки "Назад" */
+        .back-button {
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInLeft 0.3s ease forwards;
+            animation-delay: 0.1s;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Анимация для навигационной панели */
+        .nav-bar {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideInUp 0.3s ease forwards;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Стили для модального окна */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .modal-content {
+            background: var(--tg-theme-bg-color, #fff);
+            border-radius: 12px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            height: 90%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideInUp 0.3s ease forwards;
+        }
+
+        .modal h3 {
+            margin: 0 0 16px 0;
+            color: var(--tg-theme-text-color, #000);
+            font-size: 18px;
+        }
+
+        .modal textarea {
+            width: 100%;
+            height: 80%;
+            padding: 12px;
+            border: 1px solid var(--tg-theme-hint-color, rgba(0, 0, 0, 0.1));
+            border-radius: 8px;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #000);
+            font-family: inherit;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: none;
+            margin-bottom: 16px;
+            overflow: auto;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .modal-button.cancel {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #000);
+        }
+
+        .modal-button.save {
+            background: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #fff);
+        }
+
+        .modal-button:hover {
+            opacity: 0.8;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -323,6 +742,11 @@
         <div id="entry-screen" class="screen">
             <input type="date" class="date-input" id="entry-date">
             <ul class="truth-list" id="truth-list"></ul>
+            <textarea 
+                class="comment-input" 
+                id="entry-comment" 
+                placeholder="Добавьте комментарий к этому дню (необязательно)..."
+            ></textarea>
             <button class="submit-button" id="submit-entry">Сохранить</button>
         </div>
 
@@ -352,7 +776,7 @@
             </div>
             <div class="nav-item" data-screen="rules-screen">
                 <div class="nav-icon">📚</div>
-                Правила
+                Истины
             </div>
         </div>
     </div>
@@ -374,76 +798,76 @@
         ];
 
         const TRUTH_DETAILS = [
-    {
+        {
         title: "Правильное понимание",
         emoji: "🔍",
         description: "Правильное понимание (самма-диттхи) заключается в осознании Четырёх Благородных Истин: страдания, его происхождения, прекращения и пути, ведущего к его прекращению. Это понимание помогает увидеть истинную природу реальности и освободиться от иллюзий, которые являются причиной страданий.",
-        application: "В повседневной жизни это означает осознание непостоянства всех явлений и уменьшение привязанностей, что способствует снижению стресса и неудовлетворённости.",
+        application: "В повседневной жизни это означает осознание непостоянства всех явлений и уменьшение привязанностей, что способствует снижению стресса и неудовлетворённости. Например, понимая, что материальные вещи временные, человек может меньше беспокоиться о потерях или поломках. Как сказал Будда: \"Все составные вещи подвержены разрушению.\"",
         sources: [
-            { title: "Дхаммачаккаппаваттана сутта", url: "https://dhamma.ru/canon/sn/sn56-11.htm" }
+            { title: "Благородный Восьмеричный Путь", url: "https://theravada.ru/8-noble-path.htm" }
         ]
     },
     {
         title: "Правильное намерение",
         emoji: "🎯",
         description: "Правильное намерение (самма-санкаппа) подразумевает стремление к отречению от мирских привязанностей, доброжелательность и ненасилие. Это означает развитие мыслей, свободных от жадности, злобы и жестокости, направленных на благополучие всех существ.",
-        application: "В ежедневной жизни это проявляется в формировании позитивных намерений перед любыми действиями, например, начинать день с решения быть добрым и терпеливым.",
+        application: "В ежедневной жизни это проявляется в формировании позитивных намерений перед любыми действиями. Например, начинать день с решения быть добрым и терпеливым, что способствует улучшению взаимоотношений и внутреннего спокойствия. Как отмечает Бханте Пуннаджи: \"Практика без понимания того, в чём состоит проблема, и что является её решением, напоминает попытки лечить болезнь, не установив правильного диагноза.\"",
         sources: [
-            { title: "Маха-саччака сутта", url: "https://dhamma.ru/canon/mn/mn36.htm" }
+            { title: "Восьмеричный Путь и практика мирянина — Бханте Пуннаджи", url: "https://theravada.world/vosmerichnyj-put-i-praktika-miryanina-bhante-punnadzhi/" }
         ]
     },
     {
         title: "Правильная речь",
         emoji: "🗣️",
         description: "Правильная речь (самма-вача) включает воздержание от лжи, злословия, грубости и пустословия. Это предполагает использование слов, которые приносят пользу, являются правдивыми, доброжелательными и способствуют гармонии в общении.",
-        application: "В повседневной жизни это означает говорить правду, избегать сплетен и оскорблений, а также стремиться к конструктивному и уважительному общению.",
+        application: "В повседневной жизни это означает говорить правду, избегать сплетен и оскорблений, а также стремиться к конструктивному и уважительному общению. Например, прежде чем что-то сказать, стоит задуматься, принесут ли наши слова пользу и не причинят ли вреда другим. Как говорится в сутте: \"Это речь, направляющая на Путь и укрепляющая решимость человека жить правильной жизнью.\"",
         sources: [
-            { title: "Сутта о правильной речи", url: "https://dhamma.ru/canon/sn/sn45-8.htm" }
+            { title: "Благородный Восьмеричный Путь", url: "https://theravada.ru/8-noble-path.htm" }
         ]
     },
     {
         title: "Правильное действие",
         emoji: "👐",
         description: "Правильное действие (самма-камманта) означает воздержание от убийства живых существ, кражи и неправильного сексуального поведения. Это предполагает ведение жизни, основанной на уважении к другим, честности и нравственной чистоте.",
-        application: "В повседневной жизни это проявляется в уважении к жизни и собственности других, честности в делах и верности в отношениях.",
+        application: "В повседневной жизни это проявляется в уважении к жизни и собственности других, честности в делах и верности в отношениях. Например, человек, практикующий правильное действие, не будет причинять вред другим существам и будет стремиться к честному заработку.",
         sources: [
-            { title: "Сутта о правильном действии", url: "https://dhamma.ru/canon/sn/sn45-8.htm" }
+            { title: "Благородный Восьмеричный Путь", url: "https://theravada.ru/8-noble-path.htm" }
         ]
     },
     {
         title: "Правильный образ жизни",
         emoji: "💼",
         description: "Правильный образ жизни (самма-аджива) подразумевает зарабатывание средств честным и нравственным способом, который не причиняет вреда другим существам. Это включает отказ от профессий, связанных с насилием, обманом или эксплуатацией.",
-        application: "В повседневной жизни это означает выбор работы, которая приносит пользу обществу и не противоречит моральным принципам.",
+        application: "В повседневной жизни это означает выбор работы, которая приносит пользу обществу и не противоречит моральным принципам, а также избегание деятельности, наносящей вред другим. Например, человек может отказаться от работы, связанной с производством оружия или торговли вредными веществами.",
         sources: [
-            { title: "Сутта о правильном образе жизни", url: "https://dhamma.ru/canon/sn/sn45-8.htm" }
+            { title: "Благородный Восьмеричный Путь", url: "https://theravada.ru/8-noble-path.htm" }
         ]
     },
     {
         title: "Правильное усилие",
         emoji: "💪",
         description: "Правильное усилие (самма-ваяма) заключается в приложении усилий для предотвращения возникновения неблагих состояний и развития благих. Это включает постоянную работу над собой, направленную на очищение ума и культивирование добродетелей.",
-        application: "В повседневной жизни это проявляется в стремлении развивать положительные качества, такие как доброта и терпение, и избегать негативных состояний, как гнев или зависть.",
+        application: "В повседневной жизни это проявляется в стремлении развивать положительные качества, такие как доброта и терпение, и избегать негативных состояний, как гнев или зависть. Например, при возникновении негативных мыслей человек может осознанно переключаться на позитивные или практиковать медитацию для успокоения ума.",
         sources: [
-            { title: "Сутта о правильном усилии", url: "https://dhamma.ru/canon/sn/sn45-8.htm" }
+            { title: "Благородный Восьмеричный Путь", url: "https://theravada.ru/8-noble-path.htm" }
         ]
     },
     {
         title: "Правильное внимание",
         emoji: "🧘",
         description: "Правильное внимание (самма-сати) означает поддержание осознанности и внимательности к телу, чувствам, уму и умственным объектам. Это способствует глубокому пониманию природы реальности и освобождению от привязанностей.",
-        application: "В повседневной жизни это может быть практикой медитации, а также осознанным присутствием в каждом моменте, что помогает лучше понимать свои мысли и эмоции.",
+        application: "В повседневной жизни это может проявляться через практику медитации, такую как анапанасати — осознанное наблюдение за дыханием. Например, уделяя несколько минут в день наблюдению за своим дыханием, человек может развить способность оставаться в настоящем моменте, что способствует снижению стресса и повышению концентрации. Как говорится в 'Анапанасати-сутте': 'Постоянно памятуя, он вдыхает и выдыхает'.",
         sources: [
-            { title: "Сутта о правильном памятовании", url: "https://dhamma.ru/canon/sn/sn45-8.htm" }
+            { title: "Благородный Восьмеричный Путь", url: "https://theravada.ru/8-noble-path.htm" }
         ]
     },
     {
         title: "Правильное сосредоточение",
-        emoji: "🧘‍♂️",
+        emoji: "🎯",
         description: "Правильное сосредоточение (самма-самадхи) предполагает развитие глубоких состояний медитативного погружения, которые ведут к успокоению ума и постижению истинной природы вещей. Это кульминация практики, ведущая к освобождению от страданий.",
-        application: "В повседневной жизни это означает регулярную практику медитации, способствующую улучшению концентрации и внутреннего покоя.",
+        application: "В повседневной жизни это означает регулярную практику медитации, способствующую улучшению концентрации и внутреннего покоя. Например, ежедневное выделение времени для тихого размышления или медитации помогает развить устойчивое внимание и спокойствие ума. Как отмечается в 'Сатипаттхана-сутте', такие практики способствуют устранению пяти препятствий и развитию семи факторов просветления.",
         sources: [
-            { title: "Сутта о правильном сосредоточении", url: "https://dhamma.ru/canon/sn/sn45-8.htm" }
+            { title: "Благородный Восьмеричный Путь", url: "https://theravada.ru/8-noble-path.htm" }
         ]
     }
 ];
@@ -451,9 +875,11 @@
 
         let currentPeriod = 'week';
         let currentEntryData = Array(8).fill(true);
+        let currentEditingEntry = null;
+        let reportData = []; // Добавляем глобальную переменную для хранения данных отчета
 
         // Функция для переключения экранов
-        function showScreen(screenId) {
+        async function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
@@ -463,6 +889,19 @@
                 item.classList.remove('active');
             });
             document.querySelector(`[data-screen="${screenId}"]`).classList.add('active');
+
+            // Обновляем данные при переключении экрана
+            switch (screenId) {
+                case 'report-screen':
+                    await loadReport(currentPeriod);
+                    break;
+                case 'entry-screen':
+                    await initEntryScreen();
+                    break;
+                case 'rules-screen':
+                    await initRulesScreen();
+                    break;
+            }
         }
 
         // Инициализация навигации
@@ -476,6 +915,7 @@
         // Добавляем обработчик для кнопки "Назад"
         document.getElementById('back-to-rules').addEventListener('click', () => {
             showScreen('rules-screen');
+            initRulesScreen();
         });
 
         // Функция загрузки отчета
@@ -497,14 +937,9 @@
                     throw new Error(error.error || 'Ошибка загрузки отчета');
                 }
 
-                const data = await response.json();
+                reportData = await response.json(); // Сохраняем данные в глобальную переменную
                 const reportElement = document.getElementById('report');
                 reportElement.innerHTML = '';
-
-                if (data.length === 0) {
-                    reportElement.innerHTML = '<div class="no-data-message">Нет записей за выбранный период</div>';
-                    return;
-                }
 
                 // Создаем таблицу
                 const table = document.createElement('table');
@@ -516,7 +951,7 @@
                 
                 const dateHeader = document.createElement('th');
                 dateHeader.className = 'date-header';
-                dateHeader.textContent = 'Дата';
+                dateHeader.textContent = period === 'week' ? 'День' : 'Дата';
                 headerRow.appendChild(dateHeader);
 
                 TRUTHS.forEach((truth, index) => {
@@ -530,30 +965,133 @@
                 table.appendChild(thead);
 
                 const tbody = document.createElement('tbody');
-                data.forEach(entry => {
-                    const row = document.createElement('tr');
+
+                if (period === 'week') {
+                    // Для недели показываем все 7 дней
+                    const today = new Date();
+                    const currentDay = today.getDay() || 7; // Преобразуем воскресенье (0) в 7
+                    const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - currentDay + 1); // Начинаем с понедельника
+
+                    const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
                     
-                    const dateCell = document.createElement('td');
-                    dateCell.className = 'date-cell';
-                    const date = new Date(entry.date);
-                    dateCell.textContent = date.toLocaleDateString('ru-RU', {
-                        day: 'numeric',
-                        month: 'short'
-                    });
-                    row.appendChild(dateCell);
+                    for (let i = 0; i < 7; i++) {
+                        const currentDate = new Date(weekStart);
+                        currentDate.setDate(weekStart.getDate() + i);
+                        const dateStr = currentDate.toISOString().split('T')[0];
+                        
+                        const entry = reportData.find(e => e.date === dateStr);
+                        const row = document.createElement('tr');
+                        
+                        const dateCell = document.createElement('td');
+                        dateCell.className = 'date-cell';
+                        dateCell.textContent = weekdays[i];
+                        row.appendChild(dateCell);
 
-                    entry.truths.forEach(followed => {
-                        const cell = document.createElement('td');
-                        cell.className = `truth-cell ${followed ? 'followed' : 'not-followed'}`;
-                        cell.innerHTML = followed ? '✓' : '×';
-                        row.appendChild(cell);
-                    });
+                        // Если есть данные для этого дня, показываем их
+                        if (entry) {
+                            entry.truths.forEach(value => {
+                                const cell = document.createElement('td');
+                                if (value === null) {
+                                    cell.className = 'truth-cell empty';
+                                    cell.innerHTML = '–';
+                                } else {
+                                    cell.className = `truth-cell ${value ? 'followed' : 'not-followed'}`;
+                                    cell.innerHTML = value ? '✓' : '×';
+                                }
+                                row.appendChild(cell);
+                            });
+                        } else {
+                            // Если данных нет, показываем пустые ячейки
+                            for (let j = 0; j < 8; j++) {
+                                const cell = document.createElement('td');
+                                cell.className = 'truth-cell empty';
+                                cell.innerHTML = '–';
+                                row.appendChild(cell);
+                            }
+                        }
+                        
+                        tbody.appendChild(row);
+                    }
+                } else {
+                    // Для месяца оставляем как есть
+                    reportData.forEach(entry => {
+                        const row = document.createElement('tr');
+                        
+                        const dateCell = document.createElement('td');
+                        dateCell.className = 'date-cell';
+                        const date = new Date(entry.date);
+                        dateCell.textContent = date.toLocaleDateString('ru-RU', {
+                            day: 'numeric',
+                            month: 'short'
+                        });
+                        row.appendChild(dateCell);
 
-                    tbody.appendChild(row);
-                });
+                        entry.truths.forEach(value => {
+                            const cell = document.createElement('td');
+                            if (value === null) {
+                                cell.className = 'truth-cell empty';
+                                cell.innerHTML = '–';
+                            } else {
+                                cell.className = `truth-cell ${value ? 'followed' : 'not-followed'}`;
+                                cell.innerHTML = value ? '✓' : '×';
+                            }
+                            row.appendChild(cell);
+                        });
+
+                        tbody.appendChild(row);
+                    });
+                }
 
                 table.appendChild(tbody);
                 reportElement.appendChild(table);
+
+                // Добавляем секцию комментариев
+                const commentsSection = document.createElement('div');
+                commentsSection.className = 'comments-section';
+                commentsSection.innerHTML = '<div class="comments-title">Комментарии за ' + 
+                    (period === 'week' ? 'неделю' : 'месяц') + '</div>';
+
+                const comments = reportData
+                    .filter(entry => entry.comment && entry.comment.trim())
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .map(entry => {
+                        const date = new Date(entry.date);
+                        // Экранируем специальные символы для безопасного использования в HTML и JavaScript
+                        const escapedComment = entry.comment
+                            .replace(/'/g, "\'")
+                            .replace(/"/g, '\"');
+                        
+                        // Форматируем дату в зависимости от периода
+                        const dateDisplay = period === 'week' 
+                            ? ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'][date.getDay()]
+                            : date.toLocaleDateString('ru-RU', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                            });
+
+                        return `
+                            <div class="comment-item">
+                                <div class="comment-content">
+                                    <div class="comment-date">${dateDisplay}</div>
+                                    <div class="comment-text">${escapedComment}</div>
+                                </div>
+                                <button class="comment-edit" onclick="editComment('${entry.date}')">
+                                    ✏️
+                                </button>
+                            </div>
+                        `;
+                    });
+
+                if (comments.length > 0) {
+                    commentsSection.innerHTML += comments.join('');
+                } else {
+                    commentsSection.innerHTML += '<div class="no-comments">Нет комментариев за ' + 
+                        (period === 'week' ? 'эту неделю' : 'этот месяц') + '</div>';
+                }
+
+                reportElement.appendChild(commentsSection);
 
             } catch (error) {
                 console.error('Error loading report:', error);
@@ -587,6 +1125,9 @@
                         data.entry.truth7,
                         data.entry.truth8
                     ];
+                    
+                    // Устанавливаем комментарий, если он есть
+                    document.getElementById('entry-comment').value = data.entry.comment || '';
 
                     // Обновляем отображение
                     document.querySelectorAll('.truth-item').forEach((item, index) => {
@@ -597,8 +1138,9 @@
                         }
                     });
                 } else {
-                    // Если записи нет, сбрасываем все в true
+                    // Если записи нет, сбрасываем все в true и очищаем комментарий
                     currentEntryData = Array(8).fill(true);
+                    document.getElementById('entry-comment').value = '';
                     document.querySelectorAll('.truth-item').forEach(item => {
                         item.classList.add('active');
                     });
@@ -614,7 +1156,7 @@
         }
 
         // Инициализация экрана ввода данных
-        function initEntryScreen() {
+        async function initEntryScreen() {
             const dateInput = document.getElementById('entry-date');
             const truthList = document.getElementById('truth-list');
             const submitButton = document.getElementById('submit-entry');
@@ -625,19 +1167,7 @@
 
             // Создаем список истин
             truthList.innerHTML = '';
-            TRUTHS.forEach((truth, index) => {
-                const li = document.createElement('li');
-                li.className = 'truth-item active';
-                li.innerHTML = `
-                    <div class="truth-checkbox">✓</div>
-                    <div class="truth-text">${truth}</div>
-                `;
-                li.addEventListener('click', () => {
-                    li.classList.toggle('active');
-                    currentEntryData[index] = li.classList.contains('active');
-                });
-                truthList.appendChild(li);
-            });
+            
 
             // Добавляем обработчик изменения даты
             dateInput.addEventListener('change', () => {
@@ -645,7 +1175,28 @@
             });
 
             // Загружаем данные для текущей даты
-            loadEntryForDate(dateInput.value);
+            await loadEntryForDate(dateInput.value);
+
+
+            TRUTHS.forEach((truth, index) => {
+                const li = document.createElement('li');
+                li.className = 'truth-item';
+                li.innerHTML = `
+                    <div class="truth-checkbox"></div>
+                    <div class="truth-text">${truth}</div>
+                `;
+                li.addEventListener('click', () => {
+                    li.classList.toggle('active');
+                    const checkbox = li.querySelector('.truth-checkbox');
+                    checkbox.innerHTML = li.classList.contains('active') ? '✓' : '';
+                    currentEntryData[index] = li.classList.contains('active');
+                });
+                if (currentEntryData[index]) {
+                    li.classList.add('active');
+                    li.querySelector('.truth-checkbox').innerHTML = '✓';
+                }
+                truthList.appendChild(li);
+            });
 
             // Обработчик отправки данных
             submitButton.addEventListener('click', async () => {
@@ -658,7 +1209,8 @@
                         },
                         body: JSON.stringify({
                             date: dateInput.value,
-                            truths: currentEntryData
+                            truths: currentEntryData,
+                            comment: document.getElementById('entry-comment').value.trim()
                         })
                     });
 
@@ -672,8 +1224,9 @@
                         buttons: [{type: 'ok'}]
                     });
 
-                    // Обновляем отчет
-                    loadReport(currentPeriod);
+                    // Обновляем все экраны
+                    await loadReport(currentPeriod);
+                    await initRulesScreen();
                     showScreen('report-screen');
                 } catch (error) {
                     tg.showPopup({
@@ -686,17 +1239,53 @@
         }
 
         // Инициализация экрана правил
-        function initRulesScreen() {
+        async function initRulesScreen() {
             const rulesGrid = document.getElementById('rules-grid');
+            rulesGrid.innerHTML = ''; // Очищаем грид перед обновлением
+            
+            // Получаем данные за сегодня
+            const today = new Date().toISOString().split('T')[0];
+            let todayEntry = null;
+            
+            try {
+                const response = await fetch(`/api/entry?date=${today}`, {
+                    headers: {
+                        'X-Telegram-Init-Data': tg.initData
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    todayEntry = data.entry;
+                }
+            } catch (error) {
+                console.error('Error loading today entry:', error);
+            }
             
             TRUTHS.forEach((truth, index) => {
                 const ruleData = TRUTH_DETAILS[index];
                 const card = document.createElement('div');
                 card.className = 'rule-card';
+                
+                // Добавляем индикатор статуса, если есть данные за сегодня
+                let statusHtml = '';
+                if (todayEntry) {
+                    const status = todayEntry[`truth${index + 1}`];
+                    if (status !== null) {
+                        statusHtml = `
+                            <div class="truth-status-indicator ${status ? 'followed' : 'not-followed'}">
+                                ${status ? '✓' : '×'}
+                            </div>
+                        `;
+                    }
+                }
+                
                 card.innerHTML = `
+                    ${statusHtml}
                     <div class="rule-icon">${ruleData.emoji}</div>
                     <div class="rule-title">${truth}</div>
                 `;
+                
                 card.addEventListener('click', () => {
                     showRuleDetails(index);
                 });
@@ -705,29 +1294,128 @@
         }
 
         // Функция отображения деталей правила
-        function showRuleDetails(index) {
+        async function showRuleDetails(index) {
             const details = document.getElementById('rule-details');
+            details.dataset.ruleIndex = index; // Сохраняем индекс текущего правила
             const ruleData = TRUTH_DETAILS[index];
+            
+            // Получаем сегодняшнюю дату
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
             
             details.innerHTML = `
                 <h1 class="rule-header">
                     <span class="rule-icon">${ruleData.emoji}</span>
                     <span>${TRUTHS[index]}</span>
                 </h1>
+                <div class="truth-status-control">
+                    <div class="truth-status-date">Статус на сегодня (${today.toLocaleDateString('ru-RU')})</div>
+                    <div class="truth-status-toggle">
+                        <button class="truth-status-button followed" data-status="true">
+                            <span>✓</span>
+                        </button>
+                        <button class="truth-status-button not-followed" data-status="false">
+                            <span>×</span>
+                        </button>
+                    </div>
+                </div>
                 <div class="rule-description">${ruleData.description}</div>
                 <div class="rule-application">
                     <div class="rule-application-title">Применение:</div>
                     <div>${ruleData.application}</div>
                 </div>
                 <div class="rule-sources">
-                    <div class="rule-sources-title">Источники:</div>
+                    <div class="rule-sources-title">Ссылки:</div>
                     ${ruleData.sources.map(source => 
                         `<a href="${source.url}" class="source-link" target="_blank">${source.title}</a>`
                     ).join('')}
-                </div>
+</div>
             `;
+
+            // Загружаем текущее состояние
+            try {
+                const response = await fetch(`/api/entry?date=${formattedDate}`, {
+                    headers: {
+                        'X-Telegram-Init-Data': tg.initData
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.entry) {
+                        const truthStatus = data.entry[`truth${index + 1}`];
+                        updateTruthStatusButtons(truthStatus);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading truth status:', error);
+            }
+
+            // Добавляем обработчики для кнопок
+            const buttons = details.querySelectorAll('.truth-status-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', async () => {
+                    const status = button.dataset.status === 'true';
+                    
+                    try {
+                        // Загружаем текущие данные
+                        const response = await fetch(`/api/entry?date=${formattedDate}`, {
+                            headers: {
+                                'X-Telegram-Init-Data': tg.initData
+                            }
+                        });
+
+                        let currentData;
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.entry) {
+                                currentData = [
+                                    data.entry.truth1,
+                                    data.entry.truth2,
+                                    data.entry.truth3,
+                                    data.entry.truth4,
+                                    data.entry.truth5,
+                                    data.entry.truth6,
+                                    data.entry.truth7,
+                                    data.entry.truth8
+                                ];
+                            }
+                        }
+
+                        if (!currentData) {
+                            currentData = Array(8).fill(null);
+                        }
+
+                        // Обновляем статус конкретной истины
+                        currentData[index] = status;
+
+                        // Сохраняем обновленные данные
+                        await updateTruthStatus(index, status, formattedDate);
+                    } catch (error) {
+                        console.error('Error updating truth status:', error);
+                        tg.showPopup({
+                            title: 'Ошибка',
+                            message: 'Не удалось обновить статус истины',
+                            buttons: [{type: 'ok'}]
+                        });
+                    }
+                });
+            });
             
             showScreen('rule-details-screen');
+        }
+
+        // Функция обновления состояния кнопок
+        function updateTruthStatusButtons(status) {
+            const buttons = document.querySelectorAll('.truth-status-button');
+            buttons.forEach(button => {
+                const buttonStatus = button.dataset.status === 'true';
+                if (buttonStatus === status) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
         }
 
         // Обработчики периода отчета
@@ -741,10 +1429,228 @@
             });
         });
 
+        // Обработчик отправки данных
+        document.getElementById('submit-entry').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/entry', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Telegram-Init-Data': tg.initData
+                    },
+                    body: JSON.stringify({
+                        date: document.getElementById('entry-date').value,
+                        truths: currentEntryData,
+                        comment: document.getElementById('entry-comment').value.trim()
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка сохранения данных');
+                }
+
+                tg.showPopup({
+                    title: 'Успех',
+                    message: 'Данные успешно сохранены',
+                    buttons: [{type: 'ok'}]
+                });
+
+                // Обновляем все экраны
+                await loadReport(currentPeriod);
+                await initRulesScreen();
+                showScreen('report-screen');
+            } catch (error) {
+                tg.showPopup({
+                    title: 'Ошибка',
+                    message: error.message,
+                    buttons: [{type: 'ok'}]
+                });
+            }
+        });
+
         // Инициализация
-        initEntryScreen();
-        initRulesScreen();
-        loadReport('week');
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Дожидаемся инициализации Telegram Web App
+                await tg.ready();
+                // Сначала загружаем отчет
+                await loadReport('week');
+                // Затем инициализируем экран ввода
+                await initEntryScreen();
+                // И наконец экран правил
+                await initRulesScreen();
+            } catch (error) {
+                console.error('Error during initialization:', error);
+                tg.showPopup({
+                    title: 'Ошибка',
+                    message: 'Не удалось загрузить данные. Попробуйте обновить страницу.',
+                    buttons: [{type: 'ok'}]
+                });
+            }
+        });
+
+        // Обновляем функцию редактирования комментария
+        async function editComment(date) {
+            try {
+                // Находим запись в текущих данных отчета
+                const currentEntry = reportData.find(entry => entry.date === date);
+                if (!currentEntry) {
+                    throw new Error('Запись не найдена');
+                }
+
+                // Сохраняем текущую запись в глобальной переменной
+                currentEditingEntry = currentEntry;
+
+                // Создаем модальное окно
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <h3>Редактировать комментарий</h3>
+                        <textarea id="edit-comment-textarea" placeholder="Введите ваш комментарий...">${currentEditingEntry.comment || ''}</textarea>
+                        <div class="modal-buttons">
+                            <button class="modal-button cancel">Отмена</button>
+                            <button class="modal-button save">Сохранить</button>
+                        </div>
+                    </div>
+                `;
+
+                // Добавляем обработчик клика по фону для закрытия
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                        currentEditingEntry = null; // Очищаем переменную при закрытии
+                    }
+                });
+
+                document.body.appendChild(modal);
+
+                // Возвращаем промис, который резолвится при нажатии кнопок
+                const newComment = await new Promise((resolve) => {
+                    const textarea = modal.querySelector('#edit-comment-textarea');
+                    const saveBtn = modal.querySelector('.save');
+                    const cancelBtn = modal.querySelector('.cancel');
+
+                    saveBtn.addEventListener('click', () => {
+                        resolve({ button_id: 'save', message: textarea.value });
+                        modal.remove();
+                    });
+
+                    cancelBtn.addEventListener('click', () => {
+                        resolve({ button_id: 'cancel' });
+                        modal.remove();
+                        currentEditingEntry = null; // Очищаем переменную при отмене
+                    });
+                });
+
+                if (newComment && newComment.button_id === 'save' && currentEditingEntry) {
+                    try {
+                        const response = await fetch('/api/entry', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Telegram-Init-Data': tg.initData
+                            },
+                            body: JSON.stringify({
+                                date: currentEditingEntry.date,
+                                comment: newComment.message
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Ошибка сохранения комментария');
+                        }
+
+                        // Очищаем переменную после успешного сохранения
+                        currentEditingEntry = null;
+
+                        // Обновляем все экраны после изменения комментария
+                        await loadReport(currentPeriod);
+                        await initRulesScreen();
+                        if (document.getElementById('rule-details-screen').classList.contains('active')) {
+                            const currentRuleIndex = parseInt(document.getElementById('rule-details').dataset.ruleIndex);
+                            await showRuleDetails(currentRuleIndex);
+                        }
+                    } catch (error) {
+                        tg.showPopup({
+                            title: 'Ошибка',
+                            message: error.message,
+                            buttons: [{type: 'ok'}]
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error editing comment:', error);
+                tg.showPopup({
+                    title: 'Ошибка',
+                    message: 'Не удалось редактировать комментарий',
+                    buttons: [{type: 'ok'}]
+                });
+                currentEditingEntry = null; // Очищаем переменную в случае ошибки
+            }
+        }
+
+        // Обновляем функцию обновления статуса истины
+        async function updateTruthStatus(index, status, formattedDate) {
+            try {
+                const response = await fetch(`/api/entry?date=${formattedDate}`, {
+                    headers: {
+                        'X-Telegram-Init-Data': tg.initData
+                    }
+                });
+
+                let currentData;
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.entry) {
+                        currentData = [
+                            data.entry.truth1,
+                            data.entry.truth2,
+                            data.entry.truth3,
+                            data.entry.truth4,
+                            data.entry.truth5,
+                            data.entry.truth6,
+                            data.entry.truth7,
+                            data.entry.truth8
+                        ];
+                    }
+                }
+
+                if (!currentData) {
+                    currentData = Array(8).fill(null);
+                }
+
+                currentData[index] = status;
+
+                const saveResponse = await fetch('/api/entry', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Telegram-Init-Data': tg.initData
+                    },
+                    body: JSON.stringify({
+                        date: formattedDate,
+                        truths: currentData
+                    })
+                });
+
+                if (saveResponse.ok) {
+                    updateTruthStatusButtons(status);
+                    // Обновляем данные на других экранах
+                    await loadReport(currentPeriod);
+                    await initRulesScreen();
+                } else {
+                    throw new Error('Ошибка сохранения данных');
+                }
+            } catch (error) {
+                console.error('Error updating truth status:', error);
+                tg.showPopup({
+                    title: 'Ошибка',
+                    message: 'Не удалось обновить статус истины',
+                    buttons: [{type: 'ok'}]
+                });
+            }
+        }
     </script>
 </body>
 </html>
