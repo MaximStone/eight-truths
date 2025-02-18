@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
 import { User } from "./User";
 
 @Entity()
+@Index(["user", "date"], { unique: true })
 export class Entry {
     @PrimaryGeneratedColumn()
     id!: number;

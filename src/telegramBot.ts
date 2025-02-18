@@ -3,6 +3,7 @@ import { AppDataSource } from './dataSource';
 import { User } from './entity/User';
 import { Entry } from './entity/Entry';
 import { format, subDays } from 'date-fns';
+import { LessThan, MoreThan } from 'typeorm';
 
 export interface MySession {
     entry: boolean[];
@@ -85,12 +86,8 @@ async function generateReport(userId: number, days: number) {
 
     let report = `📊 Отчет за ${days === 6 ? 'неделю' : 'месяц'}:\n\n`;
     
-    // Создаем массив всех дат в периоде
-    const allDates = Array.from({length: days + 1}, (_, i) => subDays(new Date(), days - i));
-    
-    allDates.forEach(date => {
-        const dateString = format(date, 'yyyy-MM-dd');
-        const entry = entries.find(e => e.date === dateString);
+    entries.forEach(entry => {
+        const date = new Date(entry.date);
         const dayName = format(date, 'EEEE').toLowerCase();
         const russianDays = {
             monday: 'Понедельник',
@@ -103,16 +100,14 @@ async function generateReport(userId: number, days: number) {
         };
 
         const notFollowed = [];
-        if (entry) {
-            if (!entry.truth1) notFollowed.push(TRUTHS[0]);
-            if (!entry.truth2) notFollowed.push(TRUTHS[1]);
-            if (!entry.truth3) notFollowed.push(TRUTHS[2]);
-            if (!entry.truth4) notFollowed.push(TRUTHS[3]);
-            if (!entry.truth5) notFollowed.push(TRUTHS[4]);
-            if (!entry.truth6) notFollowed.push(TRUTHS[5]);
-            if (!entry.truth7) notFollowed.push(TRUTHS[6]);
-            if (!entry.truth8) notFollowed.push(TRUTHS[7]);
-        }
+        if (!entry.truth1) notFollowed.push(TRUTHS[0]);
+        if (!entry.truth2) notFollowed.push(TRUTHS[1]);
+        if (!entry.truth3) notFollowed.push(TRUTHS[2]);
+        if (!entry.truth4) notFollowed.push(TRUTHS[3]);
+        if (!entry.truth5) notFollowed.push(TRUTHS[4]);
+        if (!entry.truth6) notFollowed.push(TRUTHS[5]);
+        if (!entry.truth7) notFollowed.push(TRUTHS[6]);
+        if (!entry.truth8) notFollowed.push(TRUTHS[7]);
 
         const displayDate = days === 6 
             ? russianDays[dayName as keyof typeof russianDays]
@@ -123,20 +118,11 @@ async function generateReport(userId: number, days: number) {
                 ? '   ✅ Все практики соблюдены\n'
                 : `   ❌ ${notFollowed.join(', ')}\n`
         }${
-            entry?.comment 
+            entry.comment 
                 ? `   📝 Комментарий: ${entry.comment}\n\n` 
                 : '\n'
         }`;
     });
-
-    // Добавляем раздел с комментариями
-    const allComments = entries.filter(e => e.comment).map(e => 
-        `▫️ ${format(new Date(e.date), 'dd.MM')}: ${e.comment}`
-    ).join('\n');
-
-    if (allComments) {
-        report += `\n📌 Комментарии за период:\n${allComments}`;
-    }
 
     return report;
 }
@@ -437,4 +423,53 @@ bot.catch((err) => {
 export async function startBot() {
     await bot.launch();
     console.log("Telegram-бот запущен.");
+}
+
+const entryRepository = AppDataSource.getRepository(Entry);
+const userRepository = AppDataSource.getRepository(User);
+
+async function handleAspectSelection(ctx: any) {
+    try {
+        const userId = ctx.from.id;
+        const date = new Date();
+        date.setHours(0, 0, 0, 0);
+        
+        const user = await userRepository.findOneBy({ chatId: userId });
+        if (!user) {
+            throw new Error('Пользователь не найден');
+        }
+
+        // Проверяем, существует ли уже запись на эту дату
+        const existingEntry = await entryRepository.findOne({
+            where: {
+                user: { chatId: userId },
+                date: date.toISOString().split('T')[0]
+            }
+        });
+
+        if (existingEntry) {
+            await ctx.reply('Вы уже создали запись на сегодня. Вы можете редактировать существующую запись или создать новую завтра.');
+            return;
+        }
+
+        const entry = new Entry();
+        entry.user = user;
+        entry.date = date.toISOString().split('T')[0];
+        // ... rest of the existing entry creation code ...
+
+        try {
+            await entryRepository.save(entry);
+            await ctx.reply('Запись успешно сохранена!');
+        } catch (error: any) {
+            if (error.code === '23505') { // PostgreSQL unique violation error code
+                await ctx.reply('Запись на эту дату уже существует.');
+            } else {
+                console.error('Ошибка при сохранении записи:', error);
+                await ctx.reply('Произошла ошибка при сохранении записи. Пожалуйста, попробуйте позже.');
+            }
+        }
+    } catch (error) {
+        console.error('Ошибка в handleAspectSelection:', error);
+        await ctx.reply('Произошла ошибка. Пожалуйста, попробуйте позже.');
+    }
 }
